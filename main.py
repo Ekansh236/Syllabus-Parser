@@ -11,7 +11,7 @@ from streamlit_oauth import OAuth2Component
 
 load_dotenv()
 
-api_key = os.getenv("API_KEY")
+api_key = st.secrets["API_KEY"]
 if not api_key:
     st.error("API Key not found!")
     st.stop()
