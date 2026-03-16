@@ -1,7 +1,7 @@
 import streamlit as st
 from io import BytesIO
 from PyPDF2 import PdfReader
-import google.generativeai as genai
+from google import genai
 import json
 import os
 from dotenv import load_dotenv
@@ -16,7 +16,7 @@ if not api_key:
     st.error("API Key not found!")
     st.stop()
 else:
-    genai.configure(api_key=api_key)
+    client = genai.Client(api_key=api_key)
 
 CLIENT_ID = st.secrets["auth"]["client_id"]
 CLIENT_SECRET = st.secrets["auth"]["client_secret"]
@@ -65,7 +65,6 @@ def syncToCalendar(dates, token):
 @st.cache_data
 def extract_dates(syllabus):
     # Use GenAI to extract dates from the syllabus text
-    model = genai.GenerativeModel('gemini-2.5-flash')
     prompt = (
     "Role: You are an expert Academic Data Extractor. "
     "Task: Extract only gradeable assignments, exams, quizzes, and project deadlines from the provided syllabus text. "
@@ -92,7 +91,7 @@ def extract_dates(syllabus):
 
     "Syllabus text:\n\n" + syllabus
     )
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
     return response.text
 
 syllabus = st.file_uploader("Upload Syllabus (PDF)", type="pdf")
